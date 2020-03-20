@@ -265,36 +265,54 @@ function myReturnTop(target,el,judgeHide){
 }
 
 
-// 缓冲运动，透明度更改，向上向下运动
-//    备注: 事件开启定时器之前，一定要记得先清除已存在的定时器。
-//      (0) 定时获取每个时间段的当前值  px deg   
-//      (1) 动态获取速度,一般都会变成整数再运算。
-//          * 若速度值为负值，Math.floor();若速度值为正值，Math.ceil()
-//      (2) 把当前值加上速度进行改变
-//      (3) 将改变后的值赋值给元素的样式
-//  2.判断改变后的当前值大于目标值。判断肯定要放在赋值样式前。
-//  3.透明度，在算速度前，对当前值、目标值(定时器外面)都乘于100。在赋值样式前，对当前值除以100
-// el元素，attr元素属性，target运动目标值，time定时器时间间隔
-function myAnimate(ele,attr,target,time){
-    clearInterval(ele.timer);
-    target = attr == "opacity"? target*100 : target;
-    ele.timer = setInterval(()=>{
-        var current = getComputedStyle(ele)[attr];
-        // 提取单位,若存在单位，得到数组。若不存在单位，得到null
-        var unit = current.match(/[a-z]+$/);
-        unit = unit ? unit[0] : "";
-        current = parseFloat(current);
-        current = attr == "opacity"? current*100 : current;
-        var speed = (target-current)/10; 
-        console.log(target,current,speed); 
-        speed = speed>0 ? Math.ceil(speed) : Math.floor(speed);
-        current += speed;
-        if(current == target){
-            clearInterval(ele.timer);
-        }
-        current = attr == "opacity"? current/100 : current;
-        ele.style[attr] = current + unit;
-    },time)
+/* 缓冲运动，透明度更改，向上向下运动
+*    备注: 事件开启定时器之前，一定要记得先清除已存在的定时器。
+*      (0) 定时获取每个时间段的当前值  px deg   
+*      (1) 动态获取速度,一般都会变成整数再运算。
+*          * 若速度值为负值，Math.floor();若速度值为正值，Math.ceil()
+*      (2) 把当前值加上速度进行改变
+*      (3) 将改变后的值赋值给元素的样式
+*  2.判断改变后的当前值大于目标值。判断肯定要放在赋值样式前。
+*  3.透明度，在算速度前，对当前值、目标值(定时器外面)都乘于100。在赋值样式前，对当前值除以100
+* el元素，obj对象{属性：目标值}，time定时器时间间隔 myAnimate(ul,{top:target,width:700},30); animate(ball,{opacity:1},30);
+* 改进1：定时器的名字根据传进来的attr命名，防止多层定时器嵌套冲突
+* 改进2:传进来一个对象{attr:target;}拿到attr及target值
+***注意for循环是一个快速的过程，for循环里面有定时器。for循环早已经跑完了，才进入第一次定时器。所以此时传入定时器的attr是对象最后一个属性。
+****解决方案：1、利用let的块级作用域
+************2、利用闭包的特性，通过函数传参，存储起来每一次的attr
+*改进3：允许用户咋动画完成后，实现一些功能。使用回调函数。记得封装者只负责执行即可。
+*改进4：：在所有属性动画完毕后，才执行fn。用count变量存放一共要执行多少个attr的动画。当每次清除定时器，count--。在count--后判断，若count的值为0，说明动画完毕，再执行fn（）
+**/
+function myAnimate(ele,obj,time,fn){
+    var count = 0;
+    for(let attr in obj){
+      console.log(attr)
+        count++;
+        let target = obj[attr];
+        let timer = attr + "Timer"; //ele.widthTimer   ele.heightTimer;
+        clearInterval(ele[timer]);
+        target = attr == "opacity"? target*100 : target;
+        ele[timer] = setInterval(()=>{
+            var current = getComputedStyle(ele)[attr];
+            // 提取单位,若存在单位，得到数组。若不存在单位，得到null
+            var unit = current.match(/[a-z]+$/);
+            unit = unit ? unit[0] : "";
+            current = parseFloat(current);
+            current = attr == "opacity"? current*100 : current;
+            var speed = (target-current)/10; 
+            speed = speed>0 ? Math.ceil(speed) : Math.floor(speed);
+            current += speed;
+            if(current == target){
+                clearInterval(ele[timer]);
+                count--;
+            }
+            if(count == 0){
+              typeof fn == "function" && fn();
+          }
+            current = attr == "opacity"? current/100 : current;
+            ele.style[attr] = current + unit;
+        },time)
+    }
 }
 
 /*
