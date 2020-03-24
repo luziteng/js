@@ -286,7 +286,6 @@ function myReturnTop(target,el,judgeHide){
 function myAnimate(ele,obj,time,fn){
     var count = 0;
     for(let attr in obj){
-      console.log(attr)
         count++;
         let target = obj[attr];
         let timer = attr + "Timer"; //ele.widthTimer   ele.heightTimer;

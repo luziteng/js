@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>good good study</title>
+    <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+    <script tyoe="text/javascript" src="./common.js"></script>
+    <style type="text/css">
+        #ball{opacity: 0.5;max-width: 300px;max-height: 350px;}
+        ul{list-style:none;padding:0;margin:0;}
+        .lunbotu{position:relative;width:320px;height:320px;overflow: hidden;}
+        .lunbotu ul{position: absolute;top:0;left:0;}
+        .lunbotu img{display:block;width:320px;height:320px;}
+        img {
+            border: 0px;
+        }
+        .picList {
+            width: 100%;
+            float: left;
+        }
+        .picList .col {
+            width: 300px;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            float: left;
+            margin: 10px 0 0 10px;
+        }
+        .picList .col img, .col a {
+            position: absolute;
+            top: 0;
+            left: 10px;
+        }
+        .picList .col img {
+            width: 100%;
+        }
+        .picList .col a {
+            display: block;
+            width: 280px;
+            height: 180px;
+            top: 160px;
+            background:#000;
+            color: white;
+            font-style: normal;
+            line-height: 25px;
+            padding: 10px;
+            opacity: 0.8;
+            text-decoration: none;
+        }
+    </style>
+        <script type="text/javascript"> 
+            document.addEventListener("DOMContentLoaded",()=>{
+                var ball =document.querySelector("#ball");
+                ball.onmouseover = () =>{
+                    myAnimate(ball,{opacity:1},30,function(){alert("格老子哦")})
+                }
+    
+                ball.onmouseout = () =>{
+                    clearInterval(Timer);
+                    var Timer = setInterval(()=>{
+                        var currentOpactive = getComputedStyle(ball).opacity*100;
+                        var targetOpactive = 0.5*100;
+                        var speed = Math.floor((targetOpactive-currentOpactive)/10);
+                        currentOpactive+=speed;
+                        if(currentOpactive<=targetOpactive){
+                            currentOpactive=targetOpactive;
+                            clearInterval(Timer);
+    
+                        }
+                        ball.style.opacity = currentOpactive/100
+                    },30)
+                }
+
+            let lbt = document.querySelector('.lunbotu');
+            let ul = lbt.children[0];
+            let i = 0;
+            var target;
+            // 给同一个元素绑定了相同的属性，属性值发生覆盖
+            let timer = setInterval(autoplay,1000);
+            ul.onmouseover = function(){
+                clearInterval(timer);
+            }
+            ul.onmouseout = function(){
+                // 注意timer声明在函数内，另一个函数无法清除。
+                timer = setInterval(autoplay,1000);
+            }
+            function autoplay(){
+                i++;
+                if(i >= ul.children.length){
+                    i = 0;
+                }
+                target = -320 * i;
+                  myAnimate(ul,{top:target},30)
+                }
+
+            let picList = document.querySelector(".picList");
+            let cols = picList.children;
+            for(let i =0;i<cols.length;i++){
+                cols[i].onmouseenter = function(){
+                    let link = this.children[1];
+                    myAnimate(link,{top:0},30);
+                    // clearInterval(link.timer);
+                    // link.timer = setInterval(()=>{
+                    //     var currentTop = link.offsetTop;
+                    //     var speed = Math.floor((0-currentTop)/10);
+                    //     currentTop+=speed;
+                    //     if(currentTop<=0){
+                    //         currentTop=0;
+                    //         clearInterval(link.timer);
+                    //     }
+                    //     link.style.top = currentTop +'px'
+                    // },30)
+                }
+
+
+                cols[i].onmouseleave = function(){
+                    let link = this.children[1];
+                    myAnimate(link,{top:160},30);
+                    // clearInterval(link.timer);
+                    // link.timer = setInterval(()=>{
+                    //     var currentTop = link.offsetTop;
+                    //     var speed = Math.ceil((160-currentTop)/10);
+                    //     currentTop+=speed;
+                    //     if(currentTop>=160){
+                    //         currentTop=160;
+                    //         clearInterval(link.timer);
+                    //     }
+                    //     link.style.top = currentTop +'px'
+                    // },30)
+                }
+            }
+        })
+
+          
+        </script>
+</head>
+<body>
+    
+    <h4>移入移出更改透明度</h4>
+    <img src="./images/basketball.jpg" alt="" id="ball">
+    <h5>垂直滚动动轮播图</h5>
+    <div class="lunbotu">
+        <ul>
+            <li><img src="./images/b1.jpg" alt=""></li>
+            <li><img src="./images/b2.jpg" alt=""></li>
+            <li><img src="./images/b3.jpg" alt=""></li>
+        </ul>
+    </div>
+    <h3>移入移出更改上移效果</h3>
+    <div class="picList">
+        <div class="col" > 
+           <img src="./images/b1.jpg" />
+           <a href="#">那些你很冒险的梦 <br/>
+            那些你很冒险的梦，我陪你去疯。
+           </a> 
+        </div>
+        <div class="col"> 
+           <img src="./images/b2.jpg" />
+           <a href="#">只是太爱你<br/>
+              因为我不知道下一辈子还是否能遇见你，所以我今生才会那么努力，把最好的都给你
+           </a> 
+        </div>
+        <div class="col"> 
+           <img src="./images/b3.jpg" />
+           <a href="#">成全<br/>
+            成全了你的潇洒与冒险，成全了我的碧海蓝天
+           </a> 
+        </div>
+    </div>
+</body>
+</html>
