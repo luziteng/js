@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水平无缝滚动</title>
+    <link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+    <style type="text/css">
+        ul{list-style: none;padding:0;margin:0;}
+        .focus img{display: block;}
+        .focus{position:relative;overflow:hidden;height: 320px;}
+        .focus ul{position:absolute;overflow:hidden;}
+        .focus ul li{float:left;}
+        .focus .page{position:absolute;right:0;bottom:0;padding:10px;}
+        .focus .page span{display:inline-block;margin:0 5px;width:30px;height:30px;line-height:30px;background-color:rgba(0,0,0,.6);text-align:center;color:#fff;border-radius: 50%;box-shadow:0 0 10px rgba(0,0,0,.5);}
+        .focus .page span.active{background-color: rgba(255,0,0,.8);}
+    </style>
+    <script type="text/javascript" src="./common.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded",()=>{
+            let focus = document.querySelector(".focus");
+            let imgList = focus.children[0];
+            let firstImg = imgList.children[0].children[0];
+            // 问题:发现最后一张到第一张图的动画是往回走的
+            // 解决办法：复制第一张图片放到最后一张图片的后面.应该写在获取li数量len的前面
+            let cloneLi  = firstImg.parentElement.cloneNode(true);// 深复制
+            imgList.appendChild(cloneLi);
+            let len = imgList.children.length;
+            let idx ;
+            let imgWidth ;
+            let page = createPage();
+            // 设置ul的宽度，由图片的总数*图片的宽度决定。设置focus的宽度，由图片宽度决定
+            // 备注：当第一张图片加载完毕后，才获取图片宽度.时间加载顺序：dom树构建完毕=》加载图片资源=》页面加载完毕
+            // 执行定时器
+           firstImg.onload = ()=>{
+               imgWidth = firstImg.offsetWidth;
+               focus.style.width = imgWidth + "px";
+               imgList.style.width = imgWidth*len + "px";
+               timers();
+           } 
+           var timer = null;
+            //2.设置定时器，让ul每隔1秒换一张(无缝滚动)
+            let timers = function(){
+                timer = setInterval(()=>{
+                    idx=(typeof idx!=="number"?0:idx);
+                    idx++;
+                    showPic(1)
+                },3000)
+            }
+            page.onclick = function(e){
+                idx= e.target.innerHTML-1;
+                imgList.style.left = -imgWidth*idx + 'px';
+                showPic(0);
+                clearInterval(timer);
+                setTimeout(()=>{
+                    timers()
+                },2000)
+            }
+            function createPage(){
+                let page = document.createElement("div");
+                page.classList.add("page");
+                for(let i=1;i<=len-1;i++){
+                    let span = document.createElement("span");
+                    span.innerHTML = i;
+                    page.appendChild(span);
+                }
+                page.children[0].classList.add("active");
+                focus.appendChild(page);
+                return page;
+            }
+            function showPic(run){
+                if(idx>=len){
+                    imgList.style.left= 0;
+                    idx=1;
+                }
+                for(let i=0;i<len-1;i++){
+                    page.children[i].classList.remove("active");
+                }
+                if(idx == len-1){
+                    page.children[0].classList.add("active");
+                }else{
+                    page.children[idx].classList.add("active");
+                }
+                run===1?myAnimate(imgList,{left:-imgWidth*idx},30):"";
+                
+            }
+        })
+    </script>
+</head>
+<body>
+    <!-- focus的宽度是一张图片的宽度，ul是所有图片总宽度 -->
+    <!-- focus需要设置高度，使用定位后脱离文档流，无法由子元素撑开 -->
+    <div class="focus">
+        <ul>
+            <li><img src="./images/001.jpg"></li>
+            <li><img src="./images/002.jpg"></li>
+            <li><img src="./images/003.jpg"></li>
+            <li><img src="./images/004.jpg"></li>
+        </ul>
+    </div>
+</body>
+</html>
