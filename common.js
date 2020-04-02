@@ -264,6 +264,38 @@ function myReturnTop(target,el,judgeHide){
     }, 30)
 }
 
+// 匀速运动
+// ele运动元素,speed速度，obj运动的目标值，可为多个对象，time定时器时间，fn回调函数
+function myConstantSpeed(ele,speed,obj,time,fn){
+    var count =0;
+    for (let attr in obj){
+        count++;
+        let target = obj[attr];
+        let timer = attr + "Timer"; //ele.widthTimer   ele.heightTimer;
+        clearInterval(ele[timer]);
+        target = attr == "opacity"? target*100 : target;
+        console.log(target)
+        ele[timer] =setInterval(()=>{
+            var current = getComputedStyle(ele)[attr];
+            // 提取单位,若存在单位，得到数组。若不存在单位，得到null
+            var unit = current.match(/[a-z]+$/);
+            unit = unit ? unit[0] : "";
+            current = parseFloat(current);
+            current = attr == "opacity"? current*100 : current;
+            current+=speed;
+            if(current >= target){
+                    clearInterval(ele[timer]);
+                    current=target
+                    count--;
+                }
+                if(count == 0){
+                typeof fn == "function" && fn();
+            }
+            current = attr == "opacity"? current/100 : current;
+            ele.style[attr] = current + unit;
+        },time)
+    }
+  }
 
 /* 缓冲运动，透明度更改，向上向下运动
 *    备注: 事件开启定时器之前，一定要记得先清除已存在的定时器。
