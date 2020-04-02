@@ -274,7 +274,6 @@ function myConstantSpeed(ele,speed,obj,time,fn){
         let timer = attr + "Timer"; //ele.widthTimer   ele.heightTimer;
         clearInterval(ele[timer]);
         target = attr == "opacity"? target*100 : target;
-        console.log(target)
         ele[timer] =setInterval(()=>{
             var current = getComputedStyle(ele)[attr];
             // 提取单位,若存在单位，得到数组。若不存在单位，得到null
@@ -283,11 +282,19 @@ function myConstantSpeed(ele,speed,obj,time,fn){
             current = parseFloat(current);
             current = attr == "opacity"? current*100 : current;
             current+=speed;
-            if(current >= target){
-                    clearInterval(ele[timer]);
-                    current=target
-                    count--;
-                }
+            if(target>0){
+                if(current >= target){
+                        clearInterval(ele[timer]);
+                        current=target
+                        count--;
+                    }
+              }else{
+                if(current <= target){
+                  clearInterval(ele[timer]);
+                        current=target
+                        count--;
+                    }
+              }
                 if(count == 0){
                 typeof fn == "function" && fn();
             }
@@ -318,7 +325,6 @@ function myConstantSpeed(ele,speed,obj,time,fn){
 function myAnimate(ele,obj,time,fn){
     var count = 0;
     for(let attr in obj){
-      console.log(attr)
         count++;
         let target = obj[attr];
         let timer = attr + "Timer"; //ele.widthTimer   ele.heightTimer;
