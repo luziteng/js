@@ -59,15 +59,18 @@
 				this.ele.style.color = this.color;
 				this.ele.style.fontSize = this.fontSize + 'px';
 				this.ele.style.top = this.top + 'px';
-
 				this.ele.classList.add("bar-item");
 				page.el.appendChild(this.ele);
 				this.move();
 			}
 			Barrage.prototype.move = function(){
-				myAnimate(this.ele,{left:-this.ele.offsetWidth},300,() => {
+				// myAnimate(this.ele,{left:-this.ele.offsetWidth},300,() => {
+				// 	this.remove();
+                // })
+                // 这里动画效果使用匀速运动比较好
+                myConstantSpeed(this.ele,-10,{left:-this.ele.offsetWidth},100,() => {
 					this.remove();
-				})
+                })
 			}
 			Barrage.prototype.remove = function(){
 				this.ele.parentElement.removeChild(this.ele);
@@ -83,6 +86,17 @@
         nextSibling 属性返回元素节点之后的兄弟节点（包括文本节点、注释节点）；
         nextElementSibling 属性只返回元素节点之后的兄弟元素节点（不包括文本节点、注释节点）；
         */     
+        //无限发弹幕效果
+        /*
+        *1、首先我们要获取输入框，给输入框一个随机值
+        *2、拿到发送按钮，执行点击事件
+        *3、使用定时器不停的发送
+        *斗鱼直播也适用哦，亲测有效
+        */
+        setInterval(()=>{
+            document.querySelector('#msg').value='我是京城吴彦祖'+Math.round(Math.random()*10);
+            this.msg.nextElementSibling.click()
+        },2000)
     })
     </script>
 </head>
