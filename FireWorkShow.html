@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烟花效果</title>
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+    <style type="text/css">
+        html,body{overflow:hidden;height:100%;}
+        body,div,p{margin:0;padding:0;}
+        body{background:#000;font:12px/1.5 arial;color:#7A7A7A;}
+        p{position:absolute;top:55px;width:100%;text-align:center;}
+        .fire {
+            width: 3px;
+            height: 50px;
+            background: #F90;
+            box-shadow:  5px burlywood;
+            position: absolute;top:100%;
+        } 
+        .spark {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+    </style>
+    <script src="./common.js"></script>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded",()=>{
+            /*对象：
+                * 页面 page(一个，字面量)
+                    * 属性：烟花显示区域、按钮
+                    * 方法：
+                        init() 获取烟花显示区域,添加点击事件，获取光标位置，将光标位置传给烟花实例对象
+                * 烟花 fire
+                    * 属性：水平位置、烟花的半径、烟火的数量
+                    * 方法：
+                        init() 创建烟花div，插入烟花显示区域里面，设置水平位置
+                        move()  动画从当前位置移动到光标所在的位置,完成后实例化烟火
+                        remove() 当移到光标指定位置，移除掉
+                * 烟火 spark
+                    * 属性：颜色
+                    * 方法：
+                        init() 创建烟火span，一开始的定位在光标位置，插入烟花div里面.同时给它们确定最终的结束位置
+                        move() 动画，实现往指定位置移动
+                        remove() 当烟花移动到指定位置，移除掉div
+            */
+            var page ={
+                ele : document.body,
+                init:function(){
+                    this.ele.onclick=function(e){
+                        new Fire(e.clientX,e.clientY,0).init();
+                    }
+                },
+                auto:function(){
+                    new Fire(getRandNum(20,this.ele.offsetWidth/4),getRandNum(100,this.ele.offsetHeight/4*3),1).init();
+                }
+            }
+
+            function Fire(x,y,random){
+                this.left = x;
+                this.endTop = y;
+                this.radius = getRandNum(50,200);
+                this.qty = getRandNum(10,36);
+                this.random = random;
+            }
+
+            Fire.prototype.init = function(){
+                this.ele = document.createElement("div");
+                this.ele.classList.add("fire");
+                page.ele.appendChild(this.ele);
+                this.ele.style.left = this.left + "px";
+                this.move();
+            }
+
+            Fire.prototype.move = function(){
+                myAnimate(this.ele,{top:this.endTop,height:3},30,()=>{
+                    new Spark(this.ele,this.radius,this.qty,this.random).init()
+                    this.remove()
+                })
+            }
+
+            Fire.prototype.remove = function(){
+                this.ele.style.height = 0;
+            }
+
+            function Spark(parent,r,qty,random){
+                this.parent = parent;
+                this.r = r ;
+                this.qty = qty;
+                this.deg = 360/this.qty;
+                this.random = random;
+            }
+
+            Spark.prototype.init = function(){
+                for(let i = 0 ; i<this.qty;i++){
+                    this.ele = document.createElement("span");
+                    this.ele.classList.add("spark");
+                    this.parent.appendChild(this.ele);
+                    this.ele.style.backgroundColor = getRandColor();
+                    this.rad = this.random? Math.PI*this.deg*i/getRandNum(100,180):Math.PI*this.deg*i/180;// 不除以180时，将得到不规则幅度效果
+                    this.move();
+                }
+            }
+
+        
+            Spark.prototype.move = function(){
+                myAnimate(this.ele,{
+                    left:parseInt(this.r*Math.sin(this.rad)),// 取整防止抖动
+                    top:-parseInt(this.r*Math.cos(this.rad)),
+                    opacity:0
+                },30,()=>{
+                    this.remove();
+                })
+            }
+
+            Spark.prototype.remove = function(){
+                console.log(this.ele.parentElement.parentElement)
+	    		this.ele.parentElement.parentElement.removeChild(this.ele.parentElement);
+    		}
+            page.init();
+            setInterval(()=>{
+                page.auto();
+            },500)
+        })
+
+
+
+
+    </script>
+</head>
+<body>
+    <div id="tips"></div>
+</body>
+</html>
