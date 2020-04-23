@@ -78,7 +78,6 @@
 
 
             page.init();
-            console.log(page)
 
         /*
         nextSibling 属性与 nextElementSibling 属性的差别：
@@ -95,6 +94,7 @@
         */
         setInterval(()=>{
             document.querySelector('#msg').value='我是京城吴彦祖'+Math.round(Math.random()*10);
+            console.log(this.msg)
             this.msg.nextElementSibling.click()
         },2000)
     })
